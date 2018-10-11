@@ -1,3 +1,4 @@
+#! /bin/bash
 
 function clone_and_build {
   $1 clone https://bitbucket.org/Coin3D/$2
@@ -8,6 +9,11 @@ function clone_and_build {
   make install
   cd ..
 }
+
+apt update
+
+apt install -y graphviz
+apt install -y doxygen
 
 # Need hg
 apt install -y mercurial
