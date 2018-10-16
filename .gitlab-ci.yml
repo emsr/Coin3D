@@ -1,0 +1,63 @@
+image: docker:latest
+
+# use docker-in-docker for this
+services:
+  - docker:dind
+
+# pipeline image name: PROJECT_NAME.PIPELINE_ID, ex. `coin3d.456`
+variables:
+  PIPELINE_IMAGE_NAME: coin3d.$CI_PIPELINE_ID
+
+# login to the registry before we do anything!
+# build process might require another image
+before_script: 
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+stages:
+  - build
+  - deploy
+  - clean
+  - container_scanning
+
+build:
+  stage: build
+  script:
+  - docker build -t $PIPELINE_IMAGE_NAME .
+
+deploy:
+  stage: deploy
+  script:
+  - docker tag $PIPELINE_IMAGE_NAME $CI_REGISTRY_IMAGE
+  - docker push $CI_REGISTRY_IMAGE
+  - docker rmi $CI_REGISTRY_IMAGE
+  only:
+  - master
+
+clean:
+  stage: clean
+  script:
+  - docker rmi $PIPELINE_IMAGE_NAME
+
+container_scanning:
+  stage: container_scanning
+  allow_failure: true
+  variables:
+    REGISTRY_TAG: test
+  before_script: 
+    - export CLAIR_SERVER=http://"$(docker inspect clair -f '{{ .NetworkSettings.IPAddress }}')":6060
+    - echo $CLAIR_SERVER
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN rsggitlab.alionscience.com
+  script:
+    - apk add -U wget ca-certificates
+    - docker pull $CI_REGISTRY_IMAGE:$REGISTRY_TAG
+    - wget https://github.com/arminc/clair-scanner/releases/download/v8/clair-scanner_linux_amd64
+    - mv clair-scanner_linux_amd64 clair-scanner
+    - chmod +x clair-scanner
+    - touch clair-whitelist.yml
+    - while( ! wget -q -O /dev/null  ${CLAIR_SERVER}/v1/namespaces ) ; do sleep 1 ; done
+    - retries=0
+    - echo "Waiting for clair daemon to start"
+    - while( ! wget -T 10 -q -O /dev/null  ${CLAIR_SERVER}/v1/namespaces ) ; do sleep 1 ; echo -n "." ; if [ $retries -eq 10 ] ; then echo " Timeout, aborting." ; exit 1 ; fi ; retries=$(($retries+1)) ; done
+    - ./clair-scanner -c  ${CLAIR_SERVER} --ip $(hostname -i) -r gl-container-scanning-report.json -l clair.log -w clair-whitelist.yml $CI_REGISTRY_IMAGE:$REGISTRY_TAG || true
+  artifacts:
+    paths: [gl-container-scanning-report.json]
