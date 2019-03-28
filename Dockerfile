@@ -1,3 +1,5 @@
+FROM ubuntu:bionic
+
 FROM rikorose/gcc-cmake
 
 COPY coin3d.sh /coin3d/

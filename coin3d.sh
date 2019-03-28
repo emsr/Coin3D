@@ -32,6 +32,8 @@ apt install -y apt-tools
 apt install -y graphviz
 apt install -y doxygen
 
+apt install -y libx11-dev xorg-dev libglu1-mesa-dev freeglut3-dev libglew1.5 libglew1.5-dev libglu1-mesa libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev libglx-mesa0
+
 # Need hg
 apt install -y mercurial
 

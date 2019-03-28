@@ -1,22 +1,19 @@
 
 sudo docker login rsggitlab.alionscience.com/esmith-rowland
-sudo docker login hub.docker.com/r/emsr
-
 sudo docker build --rm -t rsggitlab.alionscience.com/esmith-rowland/coin3d .
 sudo docker build --rm --no-cache -t rsggitlab.alionscience.com/esmith-rowland/coin3d .
-
-# It's possible I could have a totally local build.
-sudo docker build --rm -t coin3d .
-sudo docker build --rm --no-cache -t coin3d .
-
 # Remove botched image
 sudo docker rmi rsggitlab.alionscience.com/esmith-rowland/coin3d
-
 # Remove dangling images
 sudo docker rmi $(sudo docker images --filter "dangling=true" -q --no-trunc)
 
+# It's possible I could have a totally local build.
+sudo docker login hub.docker.com/r/emsr
+sudo docker build --rm -t coin3d .
+sudo docker build --rm --no-cache -t coin3d .
 # Run latest local image.
 sudo docker run -it coin3d
+
 # System image.
 sudo docker run -it rsggitlab.alionscience.com/esmith-rowland/coin3d
 
