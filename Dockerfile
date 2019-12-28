@@ -6,4 +6,4 @@ COPY coin3d.sh /coin3d/
 
 WORKDIR /coin3d/
 
-RUN ./coin3d.sh
+RUN ./coin3d_git.sh
