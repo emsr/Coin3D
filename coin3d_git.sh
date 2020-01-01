@@ -5,7 +5,7 @@ function clone_and_build
   if [ -d $1 ]
   then
     cd $1
-    git pull
+    git pull --recurse-submodules
     cd ..
   else
     git clone --recurse-submodules https://github.com/coin3d/$1.git
