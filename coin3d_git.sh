@@ -8,7 +8,7 @@ function clone_and_build
     git pull
     cd ..
   else
-    git clone https://github.com/coin3d/$1.git
+    git clone --recurse-submodules https://github.com/coin3d/$1.git
   fi
 
   if [ -d build/$1 ]
