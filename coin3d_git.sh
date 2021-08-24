@@ -21,7 +21,7 @@ function clone_and_build
   fi
 
   make
-  make install
+  sudo make install
   cd ../..
 }
 
