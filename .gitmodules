@@ -1,0 +1,9 @@
+[submodule "coin3d/coin"]
+	path = coin3d/coin
+	url = https://github.com/coin3d/coin.git
+[submodule "coin3d/simage"]
+	path = coin3d/simage
+	url = https://github.com/coin3d/simage.git
+[submodule "coin3d/soqt"]
+	path = coin3d/soqt
+	url = https://github.com/coin3d/soqt.git
